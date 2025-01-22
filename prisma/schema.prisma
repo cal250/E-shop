@@ -21,3 +21,7 @@ model Product {
   price       Float
   createdAt   DateTime @default(now())
 }
+
+
+
+
