@@ -4,7 +4,7 @@ import { createPaymentIntent } from '../controllers/paymentController';
 const router = express.Router();
 
 // Ensure your route handler has the correct types
-router.post('/payment-intent', async (req: Request, res: Response) => {
+router.post("/payment-intent", async (req: Request, res: Response) => {
   await createPaymentIntent(req, res); // Call your controller function
 });
 

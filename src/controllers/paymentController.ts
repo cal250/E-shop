@@ -7,6 +7,7 @@ const getErrorMessage = (error: unknown): string => {
   return 'An unknown error occurred.';
 };
 
+
 // Controller to create a payment intent
 export const createPaymentIntent = async (req: Request, res: Response) => {
   try {
