@@ -1,27 +1,15 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+ model users {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
 }
-
-model User {
-  id        String  @id @default(uuid())
-  email     String  @unique
-  password  String
-  createdAt DateTime @default(now())
-}
-
-model Product {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  price       Float
-  createdAt   DateTime @default(now())
-}
-
-
-
-
