@@ -8,7 +8,7 @@ router.post("/payment-intent", async (req: Request, res: Response) => {
   await createPaymentIntent(req, res); // Call your controller function
 });
 router.post("/addpayment",async(req:Request,res:Response)=>{
-  await createPaymentIntent(req,res);
+  await createPaymentMethod(req,res);
 });
 
 export default router;

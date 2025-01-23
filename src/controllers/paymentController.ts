@@ -67,6 +67,7 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
 // };
   
 export const createPaymentMethod = async (req: Request, res: Response) => {
+  
   try {
     const { cardNumber, expMonth, expYear, cvc } = req.body;
 
@@ -80,7 +81,7 @@ export const createPaymentMethod = async (req: Request, res: Response) => {
         cvc: cvc,
       },
     });
-
+    
     res.status(201).json({
       message: 'Payment method created successfully',
       paymentMethod,
@@ -89,3 +90,5 @@ export const createPaymentMethod = async (req: Request, res: Response) => {
     res.status(500).json({ error: getErrorMessage });
   }
 };
+
+ 
