@@ -67,28 +67,23 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
 // };
   
 export const createPaymentMethod = async (req: Request, res: Response) => {
-  
   try {
-    const { cardNumber, expMonth, expYear, cvc } = req.body;
+    const { paymentMethodId } = req.body;
 
-    // Create a payment method in Stripe
-    const paymentMethod = await stripe.paymentMethods.create({
-      type: 'card',
-      card: {
-        number: cardNumber,
-        exp_month: expMonth,
-        exp_year: expYear,
-        cvc: cvc,
-      },
-    });
-    
+    // Log the balance for debugging (optional)
+    const balance = await stripe.balance.retrieve();
+    console.log(balance);
+
+    // Retrieve the PaymentMethod from Stripe using the provided paymentMethodId
+    const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+
     res.status(201).json({
-      message: 'Payment method created successfully',
+      message: 'Payment method retrieved successfully',
       paymentMethod,
     });
   } catch (error) {
-    res.status(500).json({ error: getErrorMessage });
+    // Extract the error message and respond
+    const errorMessage = getErrorMessage(error);
+    res.status(500).json({ error: errorMessage });
   }
 };
-
- 

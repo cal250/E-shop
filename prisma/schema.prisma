@@ -8,8 +8,15 @@ datasource db {
 }
 
 /// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
- model users {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+// model users {
+// }
+
+model Cards {
+  id         Int      @id @default(autoincrement())
+  cardname   String   @db.VarChar(100)
+  cardnumber String   @unique @db.VarChar(16)
+  expdate    DateTime @db.Timestamp(6)
+  cvc        String   @db.VarChar(4)
+
+  @@map("cards")
 }
