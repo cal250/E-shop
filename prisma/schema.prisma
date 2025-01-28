@@ -53,6 +53,7 @@ model Category {
   createdAt     DateTime       @default(now()) @map("created_at")
   deletedAt     DateTime?      @map("deleted_at")
   subCategories SubCategory[]
+  products      Product[]      // Add this field for opposite relation
 
   @@map("categories")
 }
@@ -76,15 +77,16 @@ model Product {
   description   String?
   summary       String?
   cover         String?
-  categoryId    Int           @map("category_id")
-  createdAt     DateTime      @default(now()) @map("created_at")
-  deletedAt     DateTime?     @map("deleted_at")
-  category      Category      @relation(fields: [categoryId], references: [id])
+  categoryId    Int            @map("category_id")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  deletedAt     DateTime?      @map("deleted_at")
+  category      Category       @relation(fields: [categoryId], references: [id])
   subCategories SubCategory[]
   productSkus   ProductSku[]
   wishlist      Wishlist[]
   cartItems     CartItem[]
   orderItems    OrderItem[]
+  reviews       Review[]       // Add this field for opposite relation
 
   @@map("products")
 }
