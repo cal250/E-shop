@@ -7,16 +7,210 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
-// model users {
-// }
+model User {
+  id           Int       @id @default(autoincrement())
+  avatar       String?
+  firstName    String?   @map("first_name")
+  lastName     String?   @map("last_name")
+  username     String    @unique
+  email        String    @unique
+  password     String
+  birthOfDate  DateTime? @map("birth_of_date")
+  phoneNumber  String?   @map("phone_number")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  deletedAt    DateTime? @map("deleted_at")
+  addresses    Address[]
+  cart         Cart?
+  orderDetails OrderDetail[]
+  wishlist     Wishlist[]
+  reviews      Review[]
 
-model Cards {
-  id         Int      @id @default(autoincrement())
-  cardname   String   @db.VarChar(100)
-  cardnumber String   @unique @db.VarChar(16)
-  expdate    DateTime @db.Timestamp(6)
-  cvc        String   @db.VarChar(4)
+  @@map("users")
+}
 
-  @@map("cards")
+model Address {
+  id            Int       @id @default(autoincrement())
+  userId        Int       @map("user_id")
+  title         String?
+  addressLine1  String    @map("address_line_1")
+  addressLine2  String?   @map("address_line_2")
+  country       String
+  city          String
+  postalCode    String    @map("postal_code")
+  landmark      String?
+  phoneNumber   String    @map("phone_number")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  deletedAt     DateTime? @map("deleted_at")
+  user          User      @relation(fields: [userId], references: [id])
+
+  @@map("addresses")
+}
+
+model Category {
+  id            Int            @id @default(autoincrement())
+  name          String
+  description   String?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  deletedAt     DateTime?      @map("deleted_at")
+  subCategories SubCategory[]
+
+  @@map("categories")
+}
+
+model SubCategory {
+  id          Int       @id @default(autoincrement())
+  parentId    Int       @map("parent_id")
+  name        String
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  deletedAt   DateTime? @map("deleted_at")
+  category    Category  @relation(fields: [parentId], references: [id])
+  products    Product[]
+
+  @@map("sub_categories")
+}
+
+model Product {
+  id            Int            @id @default(autoincrement())
+  name          String
+  description   String?
+  summary       String?
+  cover         String?
+  categoryId    Int           @map("category_id")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  deletedAt     DateTime?     @map("deleted_at")
+  category      Category      @relation(fields: [categoryId], references: [id])
+  subCategories SubCategory[]
+  productSkus   ProductSku[]
+  wishlist      Wishlist[]
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+
+  @@map("products")
+}
+
+model ProductAttribute {
+  id        Int          @id @default(autoincrement())
+  type      String      // ENUM ('color', 'size')
+  value     String
+  createdAt DateTime     @default(now()) @map("created_at")
+  deletedAt DateTime?    @map("deleted_at")
+  skusSize  ProductSku[] @relation("SizeAttribute")
+  skusColor ProductSku[] @relation("ColorAttribute")
+
+  @@map("product_attributes")
+}
+
+model ProductSku {
+  id              Int              @id @default(autoincrement())
+  productId       Int              @map("product_id")
+  sizeAttributeId Int              @map("size_attribute_id")
+  colorAttributeId Int             @map("color_attribute_id")
+  sku             String
+  price           String
+  quantity        Int
+  createdAt       DateTime         @default(now()) @map("created_at")
+  deletedAt       DateTime?        @map("deleted_at")
+  product         Product          @relation(fields: [productId], references: [id])
+  sizeAttribute   ProductAttribute @relation("SizeAttribute", fields: [sizeAttributeId], references: [id])
+  colorAttribute  ProductAttribute @relation("ColorAttribute", fields: [colorAttributeId], references: [id])
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+
+  @@map("products_skus")
+}
+
+model Wishlist {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  productId Int       @map("product_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+  user      User      @relation(fields: [userId], references: [id])
+  product   Product   @relation(fields: [productId], references: [id])
+
+  @@map("wishlist")
+}
+
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique @map("user_id")
+  total     Int
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
+
+  @@map("cart")
+}
+
+model CartItem {
+  id            Int        @id @default(autoincrement())
+  cartId        Int        @map("cart_id")
+  productId     Int        @map("product_id")
+  productsSkuId Int        @map("products_sku_id")
+  quantity      Int
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  cart          Cart       @relation(fields: [cartId], references: [id])
+  product       Product    @relation(fields: [productId], references: [id])
+  productSku    ProductSku @relation(fields: [productsSkuId], references: [id])
+
+  @@map("cart_item")
+}
+
+model OrderDetail {
+  id        Int           @id @default(autoincrement())
+  userId    Int          @map("user_id")
+  paymentId Int          @map("payment_id")
+  total     Int
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  user      User         @relation(fields: [userId], references: [id])
+  items     OrderItem[]
+  payment   PaymentDetail?
+
+  @@map("order_details")
+}
+
+model OrderItem {
+  id            Int        @id @default(autoincrement())
+  orderId       Int        @map("order_id")
+  productId     Int        @map("product_id")
+  productsSkuId Int        @map("products_sku_id")
+  quantity      Int
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  order         OrderDetail @relation(fields: [orderId], references: [id])
+  product       Product    @relation(fields: [productId], references: [id])
+  productSku    ProductSku @relation(fields: [productsSkuId], references: [id])
+
+  @@map("order_item")
+}
+
+model PaymentDetail {
+  id        Int         @id @default(autoincrement())
+  orderId   Int         @unique @map("order_id")
+  amount    Int
+  provider  String
+  status    String
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  order     OrderDetail @relation(fields: [orderId], references: [id])
+
+  @@map("payment_details")
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String?
+  productId Int      @map("product_id")
+  userId    Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  product   Product  @relation(fields: [productId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("reviews")
 }
