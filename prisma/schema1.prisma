@@ -1,0 +1,130 @@
+// Define the data source for PostgreSQL
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String     @unique
+  password    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  addresses   Address[]  @relation("UserAddresses")
+  wishlists   Wishlist[] @relation("UserWishlists")
+}
+
+model Address {
+  id        Int      @id @default(autoincrement())
+  street    String
+  city      String
+  country   String
+  postalCode String
+  userId    Int
+  user      User     @relation("UserAddresses", fields: [userId], references: [id])
+}
+
+model Product {
+  id             Int             @id @default(autoincrement())
+  name           String
+  description    String
+  price          Float
+  categoryId     Int
+  subCategories  SubCategory[]   @relation("ProductSubCategories")
+  skus           ProductSku[]    @relation("ProductSkus")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model ProductSku {
+  id               Int               @id @default(autoincrement())
+  sku              String
+  sizeAttributeId  Int?
+  colorAttributeId Int?
+  price            Float
+  quantity         Int
+  productId        Int
+  product          Product           @relation("ProductSkus", fields: [productId], references: [id])
+  attributes       ProductAttribute[] @relation("AttributeSkus")
+  cartItems        CartItem[]        @relation("ProductSkuCartItems")
+  orderItems       OrderItem[]       @relation("ProductSkuOrderItems")
+}
+
+model ProductAttribute {
+  id        Int        @id @default(autoincrement())
+  name      String
+  value     String
+  skuId     Int
+  sku       ProductSku @relation("AttributeSkus", fields: [skuId], references: [id])
+}
+
+model SubCategory {
+  id          Int        @id @default(autoincrement())
+  name        String
+  products    Product[]  @relation("ProductSubCategories")
+}
+
+model Wishlist {
+  id       Int       @id @default(autoincrement())
+  userId   Int
+  user     User      @relation("UserWishlists", fields: [userId], references: [id])
+  products Product[] @relation("WishlistProducts")
+}
+
+model Cart {
+  id         Int        @id @default(autoincrement())
+  userId     Int
+  user       User       @relation("UserCart", fields: [userId], references: [id])
+  cartItems  CartItem[]
+}
+
+model CartItem {
+  id            Int        @id @default(autoincrement())
+  cartId        Int
+  productId     Int
+  productsSkuId Int
+  quantity      Int
+  cart          Cart       @relation("CartItems", fields: [cartId], references: [id])
+  product       Product    @relation("ProductCartItems", fields: [productId], references: [id])
+  sku           ProductSku @relation("ProductSkuCartItems", fields: [productsSkuId], references: [id])
+}
+
+model OrderDetail {
+  id        Int         @id @default(autoincrement())
+  userId    Int
+  user      User        @relation("UserOrders", fields: [userId], references: [id])
+  orderItems OrderItem[]
+}
+
+model OrderItem {
+  id             Int        @id @default(autoincrement())
+  orderId        Int
+  productId      Int
+  productsSkuId  Int
+  quantity       Int
+  order          OrderDetail @relation("OrderItems", fields: [orderId], references: [id])
+  product        Product     @relation("ProductOrderItems", fields: [productId], references: [id])
+  sku            ProductSku  @relation("ProductSkuOrderItems", fields: [productsSkuId], references: [id])
+}
+
+
+
+model ProductSku {
+  id               Int               @id @default(autoincrement())
+  sku              String
+  sizeAttributeId  Int?
+  colorAttributeId Int?
+  price            Float
+  quantity         Int
+  productId        Int
+  product          Product           @relation("ProductSkus", fields: [productId], references: [id])
+  attributes       ProductAttribute[] @relation("AttributeSkus")
+  cartItems        CartItem[]        @relation("ProductSkuCartItems")
+  orderItems       OrderItem[]       @relation("ProductSkuOrderItems")
+}
+
