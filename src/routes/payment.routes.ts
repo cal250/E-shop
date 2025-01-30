@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express'; // Make sure to import Request and Response from 'express'
-import { createPaymentIntent,createPaymentMethod } from '../controllers/paymentController';
+import { createPaymentIntent,createPaymentMethod } from '../controllers/payment.controller';
 
 const router = express.Router();
 

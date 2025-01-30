@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import stripe from '../config/stripe';
+import stripe from '../config/stripe.config';
 
 // Utility function to extract error messages safely
 const getErrorMessage = (error: unknown): string => {

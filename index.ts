@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import paymentRoutes from './src/routes/paymentRoutes';
-import stripe from './src/config/stripe';
+import paymentRoutes from './src/routes/payment.routes';
+import stripe from './src/config/stripe.config';
 
 dotenv.config();
 
