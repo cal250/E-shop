@@ -10,10 +10,9 @@ export const UserController = {
       const user = await prisma.user.create({
         data: {
           email,
-          password, // Note: Should be hashed in production
-          username,
-          firstName,
-          lastName
+          name : username,
+          password,
+
         }
       });
       res.status(201).json(user);
@@ -29,7 +28,8 @@ export const UserController = {
         where: { id: Number(id) },
         include: {
           addresses: true,
-          orderDetails: true,
+          // orderDetails: true,
+          orders:true
         }
       });
       res.json(user);

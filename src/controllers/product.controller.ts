@@ -7,10 +7,13 @@ export const ProductController = {
   async getAll(req: Request, res: Response) {
     try {
       const products = await prisma.product.findMany({
-        include: {
-          productSkus: true,
-          category: true,
-          subCategories: true,
+        // include: {
+        //   productSkus: true,
+        //   category: true,
+        //   subCategories: true,
+        // }
+        include:{
+          skus:true,
         }
       });
       res.json(products);
@@ -25,10 +28,10 @@ export const ProductController = {
       const product = await prisma.product.findUnique({
         where: { id: Number(id) },
         include: {
-          productSkus: {
+          skus: {
             include: {
-              sizeAttribute: true,
-              colorAttribute: true,
+              // sizeAttribute: true,
+              // colorAttribute: true,
             }
           },
           reviews: true,
