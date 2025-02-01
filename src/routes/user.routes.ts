@@ -1,10 +1,32 @@
-
 import { Router } from 'express';
-import { UserController } from '../controllers/user.controller';
+import {
+
+createUser,
+getUserById,
+getUserByEmail,
+updateUser,
+deleteUser,
+getAllUsers,
+} from '../controllers/user.controller';
 
 const router = Router();
 
-router.post('/register', UserController.register);
-router.get('/:id', UserController.getProfile);
+// Create a new user
+router.post('/', createUser);
+
+// Get all users with pagination
+router.get('/', getAllUsers);
+
+// Get user by ID
+router.get('/:id', getUserById);
+
+// Get user by email
+router.get('/email/:email', getUserByEmail);
+
+// Update user
+router.put('/:id', updateUser);
+
+// Delete user
+router.delete('/:id', deleteUser);
 
 export default router;

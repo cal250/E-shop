@@ -8,52 +8,52 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   avatar       String?
-  firstName    String?   @map("first_name")
-  lastName     String?   @map("last_name")
-  username     String    @unique
-  email        String    @unique
+  firstName    String?       @map("first_name")
+  lastName     String?       @map("last_name")
+  username     String        @unique
+  email        String        @unique
   password     String
-  birthOfDate  DateTime? @map("birth_of_date")
-  phoneNumber  String?   @map("phone_number")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  deletedAt    DateTime? @map("deleted_at")
+  phoneNumber  String?       @map("phone_number")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  deletedAt    DateTime?     @map("deleted_at")
   addresses    Address[]
   cart         Cart?
   orderDetails OrderDetail[]
   wishlist     Wishlist[]
   reviews      Review[]
+  role         String?       @default("USER")
 
   @@map("users")
 }
 
 model Address {
-  id            Int       @id @default(autoincrement())
-  userId        Int       @map("user_id")
-  title         String?
-  addressLine1  String    @map("address_line_1")
-  addressLine2  String?   @map("address_line_2")
-  country       String
-  city          String
-  postalCode    String    @map("postal_code")
-  landmark      String?
-  phoneNumber   String    @map("phone_number")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  deletedAt     DateTime? @map("deleted_at")
-  user          User      @relation(fields: [userId], references: [id])
+  id           Int       @id @default(autoincrement())
+  userId       Int       @map("user_id")
+  title        String?
+  addressLine1 String    @map("address_line_1")
+  addressLine2 String?   @map("address_line_2")
+  country      String
+  city         String
+  postalCode   String    @map("postal_code")
+  landmark     String?
+  phoneNumber  String    @map("phone_number")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  deletedAt    DateTime? @map("deleted_at")
+  user         User      @relation(fields: [userId], references: [id])
 
   @@map("addresses")
 }
 
 model Category {
-  id            Int            @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   name          String
   description   String?
-  createdAt     DateTime       @default(now()) @map("created_at")
-  deletedAt     DateTime?      @map("deleted_at")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  deletedAt     DateTime?     @map("deleted_at")
   subCategories SubCategory[]
-  products      Product[]      // Add this field for opposite relation
+  products      Product[] // Add this field for opposite relation
 
   @@map("categories")
 }
@@ -72,28 +72,28 @@ model SubCategory {
 }
 
 model Product {
-  id            Int            @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   name          String
   description   String?
   summary       String?
   cover         String?
-  categoryId    Int            @map("category_id")
-  createdAt     DateTime       @default(now()) @map("created_at")
-  deletedAt     DateTime?      @map("deleted_at")
-  category      Category       @relation(fields: [categoryId], references: [id])
+  categoryId    Int           @map("category_id")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  deletedAt     DateTime?     @map("deleted_at")
+  category      Category      @relation(fields: [categoryId], references: [id])
   subCategories SubCategory[]
   productSkus   ProductSku[]
   wishlist      Wishlist[]
   cartItems     CartItem[]
   orderItems    OrderItem[]
-  reviews       Review[]       // Add this field for opposite relation
+  reviews       Review[] // Add this field for opposite relation
 
   @@map("products")
 }
 
 model ProductAttribute {
   id        Int          @id @default(autoincrement())
-  type      String      // ENUM ('color', 'size')
+  type      String // ENUM ('color', 'size')
   value     String
   createdAt DateTime     @default(now()) @map("created_at")
   deletedAt DateTime?    @map("deleted_at")
@@ -104,20 +104,20 @@ model ProductAttribute {
 }
 
 model ProductSku {
-  id              Int              @id @default(autoincrement())
-  productId       Int              @map("product_id")
-  sizeAttributeId Int              @map("size_attribute_id")
-  colorAttributeId Int             @map("color_attribute_id")
-  sku             String
-  price           String
-  quantity        Int
-  createdAt       DateTime         @default(now()) @map("created_at")
-  deletedAt       DateTime?        @map("deleted_at")
-  product         Product          @relation(fields: [productId], references: [id])
-  sizeAttribute   ProductAttribute @relation("SizeAttribute", fields: [sizeAttributeId], references: [id])
-  colorAttribute  ProductAttribute @relation("ColorAttribute", fields: [colorAttributeId], references: [id])
-  cartItems       CartItem[]
-  orderItems      OrderItem[]
+  id               Int              @id @default(autoincrement())
+  productId        Int              @map("product_id")
+  sizeAttributeId  Int              @map("size_attribute_id")
+  colorAttributeId Int              @map("color_attribute_id")
+  sku              String
+  price            String
+  quantity         Int
+  createdAt        DateTime         @default(now()) @map("created_at")
+  deletedAt        DateTime?        @map("deleted_at")
+  product          Product          @relation(fields: [productId], references: [id])
+  sizeAttribute    ProductAttribute @relation("SizeAttribute", fields: [sizeAttributeId], references: [id])
+  colorAttribute   ProductAttribute @relation("ColorAttribute", fields: [colorAttributeId], references: [id])
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
 
   @@map("products_skus")
 }
@@ -162,13 +162,13 @@ model CartItem {
 }
 
 model OrderDetail {
-  id        Int           @id @default(autoincrement())
-  userId    Int          @map("user_id")
-  paymentId Int          @map("payment_id")
+  id        Int            @id @default(autoincrement())
+  userId    Int            @map("user_id")
+  paymentId Int            @map("payment_id")
   total     Int
-  createdAt DateTime     @default(now()) @map("created_at")
-  updatedAt DateTime     @updatedAt @map("updated_at")
-  user      User         @relation(fields: [userId], references: [id])
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  user      User           @relation(fields: [userId], references: [id])
   items     OrderItem[]
   payment   PaymentDetail?
 
@@ -176,16 +176,16 @@ model OrderDetail {
 }
 
 model OrderItem {
-  id            Int        @id @default(autoincrement())
-  orderId       Int        @map("order_id")
-  productId     Int        @map("product_id")
-  productsSkuId Int        @map("products_sku_id")
+  id            Int         @id @default(autoincrement())
+  orderId       Int         @map("order_id")
+  productId     Int         @map("product_id")
+  productsSkuId Int         @map("products_sku_id")
   quantity      Int
-  createdAt     DateTime   @default(now()) @map("created_at")
-  updatedAt     DateTime   @updatedAt @map("updated_at")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
   order         OrderDetail @relation(fields: [orderId], references: [id])
-  product       Product    @relation(fields: [productId], references: [id])
-  productSku    ProductSku @relation(fields: [productsSkuId], references: [id])
+  product       Product     @relation(fields: [productId], references: [id])
+  productSku    ProductSku  @relation(fields: [productsSkuId], references: [id])
 
   @@map("order_item")
 }
