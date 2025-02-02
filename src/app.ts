@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.routes';
 import categoryRoutes from './routes/category.routes';
 import { authenticateToken } from './middlewares/auth.middleware';
+import subCategoriesRoutes from './routes/subCategory.routes';
 
 const app = express();
 
@@ -16,6 +17,8 @@ app.use(express.json());
 app.use('/users',authenticateToken, userRoutes);
 app.use("/auth", authRoutes);
 app.use("/categories", authenticateToken, categoryRoutes);
+app.use("/subcategories", authenticateToken, subCategoriesRoutes);
+
 app.use('/products', productRoutes);
 app.use('/reviews', reviewRoutes);
 app.get('/', (req, res) => {
