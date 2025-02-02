@@ -1,21 +1,18 @@
 import { Router } from 'express';
 import {
 
-createUser,
 getUserById,
 getUserByEmail,
 updateUser,
 deleteUser,
 getAllUsers,
 } from '../controllers/user.controller';
+import { requireRole } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// Create a new user
-router.post('/', createUser);
-
 // Get all users with pagination
-router.get('/', getAllUsers);
+router.get('/',requireRole('admin'), getAllUsers);
 
 // Get user by ID
 router.get('/:id', getUserById);

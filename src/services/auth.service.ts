@@ -23,7 +23,7 @@ export class AuthService {
   async register(userData: {
     email: string;
     password: string;
-    username: string;
+    phoneNumber?: string;
     firstName?: string;
     lastName?: string;
   }): Promise<User> {
@@ -31,8 +31,14 @@ export class AuthService {
 
     const user = await prisma.user.create({
       data: {
-        ...userData,
+        email: userData.email,
         password: hashedPassword,
+        phoneNumber: userData.phoneNumber,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        username: `${userData.lastName}${userData.firstName}${Math.floor(
+          Math.random() * 1000
+        )}`,
       },
     });
 
@@ -78,8 +84,8 @@ export class AuthService {
     res.cookie("accessToken", tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      sameSite: "lax",
+      maxAge: 30 * 60 * 1000, // 15 minutes
     });
 
     res.cookie("refreshToken", tokens.refreshToken, {
