@@ -18,8 +18,8 @@ app.use('/users',authenticateToken, userRoutes);
 app.use("/auth", authRoutes);
 app.use("/categories", authenticateToken, categoryRoutes);
 app.use("/subcategories", authenticateToken, subCategoriesRoutes);
-
 app.use('/products', productRoutes);
+
 app.use('/reviews', reviewRoutes);
 app.get('/', (req, res) => {
     res.send('Hello, World!');

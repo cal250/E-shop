@@ -26,12 +26,14 @@ export class AuthService {
     phoneNumber?: string;
     firstName?: string;
     lastName?: string;
+    role?: string;
   }): Promise<User> {
     const hashedPassword = await hash(userData.password, 10);
 
     const user = await prisma.user.create({
       data: {
         email: userData.email,
+        role: userData.role || "USER",
         password: hashedPassword,
         phoneNumber: userData.phoneNumber,
         firstName: userData.firstName,
@@ -66,7 +68,7 @@ export class AuthService {
   generateTokens(user: User): AuthTokens {
     const payload: TokenPayload = {
       userId: user.id,
-      role: "USER",
+      role: user.role || "USER",
     };
 
     const accessToken = jwt.sign(payload, this.accessTokenSecret, {

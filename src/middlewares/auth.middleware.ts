@@ -53,7 +53,7 @@ export const requireRole = (requiredRole: string) => {
     if (!req.user) {
       return res.status(401).json({ message: "Authentication required" });
     }
-
+   console.log(req.user)
     if (req.user.role !== requiredRole) {
       return res.status(403).json({ message: "Insufficient permissions" });
     }

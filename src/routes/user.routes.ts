@@ -12,7 +12,7 @@ import { requireRole } from '../middlewares/auth.middleware';
 const router = Router();
 
 // Get all users with pagination
-router.get('/',requireRole('admin'), getAllUsers);
+router.get('/',requireRole('ADMIN'), getAllUsers);
 
 // Get user by ID
 router.get('/:id', getUserById);

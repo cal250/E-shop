@@ -18,12 +18,12 @@ model User {
   phoneNumber  String?       @map("phone_number")
   createdAt    DateTime      @default(now()) @map("created_at")
   deletedAt    DateTime?     @map("deleted_at")
+  role         String?       @default("USER")
   addresses    Address[]
   cart         Cart?
   orderDetails OrderDetail[]
   wishlist     Wishlist[]
   reviews      Review[]
-  role         String?       @default("USER")
 
   @@map("users")
 }
