@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.routes';
 import categoryRoutes from './routes/category.routes';
 import { authenticateToken } from './middlewares/auth.middleware';
 import subCategoriesRoutes from './routes/subCategory.routes';
+import productAttributesRoutes from './routes/productAttribute.routes';
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/auth", authRoutes);
 app.use("/categories", authenticateToken, categoryRoutes);
 app.use("/subcategories", authenticateToken, subCategoriesRoutes);
 app.use('/products', productRoutes);
+app.use("/product-attributes", authenticateToken, productAttributesRoutes);
 
 app.use('/reviews', reviewRoutes);
 app.get('/', (req, res) => {
