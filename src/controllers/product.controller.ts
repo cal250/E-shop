@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export const ProductController = {
-  async getAll(req: Request, res: Response) {
+  async getAll(_req: Request, res: Response) {
     try {
       const products = await prisma.product.findMany({
         // include: {

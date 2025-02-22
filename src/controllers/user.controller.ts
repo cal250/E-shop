@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export const UserController = {
   async register(req: Request, res: Response) {
     try {
-      const { email, password, username, firstName, lastName } = req.body;
+      const { email, password, username } = req.body;
       const user = await prisma.user.create({
         data: {
           email,

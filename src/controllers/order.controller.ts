@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
-import { PrismaClient as prisma } from '@prisma/client'; // Make sure you have this prisma client configuration
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 
 // Get all orders
-export const getAllOrders = async (req: Request, res: Response) => {
+export const getAllOrders = async (req: Request, res: Response): Promise<void> => {
     try {
-        const orders = await prisma.Order.findMany(); // Use the correct case 'Order'
+        const orders = await prisma.order.findMany();
         res.status(200).json(orders);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching orders', error });
@@ -12,13 +13,14 @@ export const getAllOrders = async (req: Request, res: Response) => {
 };
 
 // Get single order by ID
-export const getOrderById = async (req: Request, res: Response) => {
+export const getOrderById = async (req: Request, res: Response): Promise<void> => {
     try {
-        const order = await prisma.Order.findUnique({ // Use the correct case 'Order'
-            where: { id: req.params.id }
+        const order = await prisma.order.findUnique({
+            where: { id: Number(req.params.id) }
         });
         if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
+            res.status(404).json({ message: 'Order not found' });
+            return;
         }
         res.status(200).json(order);
     } catch (error) {
@@ -27,9 +29,9 @@ export const getOrderById = async (req: Request, res: Response) => {
 };
 
 // Create new order
-export const createOrder = async (req: Request, res: Response) => {
+export const createOrder = async (req: Request, res: Response): Promise<void> => {
     try {
-        const savedOrder = await prisma.Order.create({ // Use the correct case 'Order'
+        const savedOrder = await prisma.order.create({
             data: req.body
         });
         res.status(201).json(savedOrder);
@@ -39,31 +41,33 @@ export const createOrder = async (req: Request, res: Response) => {
 };
 
 // Update order
-export const updateOrder = async (req: Request, res: Response) => {
+export const updateOrder = async (req: Request, res: Response): Promise<void> => {
     try {
-        const updatedOrder = await prisma.Order.update({ // Use the correct case 'Order'
-            where: { id: req.params.id },
+        const updatedOrder = await prisma.order.update({
+            where: { id: Number(req.params.id) },
             data: req.body
         });
         res.status(200).json(updatedOrder);
-    } catch (error) {
+    } catch (error: any) {
         if (error.code === 'P2025') {
-            return res.status(404).json({ message: 'Order not found' });
+            res.status(404).json({ message: 'Order not found' });
+            return;
         }
         res.status(500).json({ message: 'Error updating order', error });
     }
 };
 
 // Delete order
-export const deleteOrder = async (req: Request, res: Response) => {
+export const deleteOrder = async (req: Request, res: Response): Promise<void> => {
     try {
-        await prisma.Order.delete({ // Use the correct case 'Order'
-            where: { id: req.params.id }
+        await prisma.order.delete({
+            where: { id: Number(req.params.id) }
         });
         res.status(200).json({ message: 'Order deleted successfully' });
-    } catch (error) {
+    } catch (error: any) {
         if (error.code === 'P2025') {
-            return res.status(404).json({ message: 'Order not found' });
+            res.status(404).json({ message: 'Order not found' });
+            return;
         }
         res.status(500).json({ message: 'Error deleting order', error });
     }

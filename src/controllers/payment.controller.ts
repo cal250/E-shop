@@ -35,36 +35,7 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
   }
 };
 
-// export const addPaymentMethod = async (req: Request, res: Response) => {
-//   try {
-//     const { paymentMethodId, customerId } = req.body;
 
-//     // Validate input
-//     if (!paymentMethodId || !customerId) {
-//       return res.status(400).json({ error: 'PaymentMethodId and CustomerId are required.' });
-//     }
-
-//     // Attach the payment method to the customer
-//     const paymentMethod = await stripe.paymentMethods.attach(paymentMethodId, {
-//       customer: customerId,
-//     });
-
-//     // Optionally set the payment method as the default for the customer
-//     await stripe.customers.update(customerId, {
-//       invoice_settings: {
-//         default_payment_method: paymentMethodId,
-//       },
-//     });
-
-//     res.status(200).json({
-//       message: 'Payment method added successfully',
-//       paymentMethod,
-//     });
-//   } catch (error) {
-//     const errorMessage = getErrorMessage(error);
-//     res.status(500).json({ error: errorMessage });
-//   }
-// };
   
 export const createPaymentMethod = async (req: Request, res: Response) => {
   try {
