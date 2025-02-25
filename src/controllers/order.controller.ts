@@ -1,70 +1,68 @@
 import { Request, Response } from 'express';
-import { prisma } from '../lib/prisma'; // Make sure you have this prisma client configuration
+import { OrderService } from '../services/order.service';
+import { CreateOrderDto, UpdateOrderStatusDto } from '../types/order.types';
 
-// Get all orders
-export const getAllOrders = async (req: Request, res: Response) => {
-    try {
-        const orders = await prisma.order.findMany();
-        res.status(200).json(orders);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching orders', error });
-    }
-};
+// Create an instance of OrderService
+const orderService = new OrderService();
 
-// Get single order by ID
-export const getOrderById = async (req: Request, res: Response) => {
-    try {
-        const order = await prisma.order.findUnique({
-            where: { id: req.params.id }
-        });
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
-        }
-        res.status(200).json(order);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching order', error });
-    }
-};
-
-// Create new order
 export const createOrder = async (req: Request, res: Response) => {
     try {
-        const savedOrder = await prisma.order.create({
-            data: req.body
-        });
-        res.status(201).json(savedOrder);
+        const orderData: CreateOrderDto = req.body;
+        const result = await orderService.createOrder(orderData);
+        
+        return res.status(result.success ? 201 : 400).json(result);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating order', error });
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
     }
 };
 
-// Update order
-export const updateOrder = async (req: Request, res: Response) => {
+export const getOrder = async (req: Request, res: Response) => {
     try {
-        const updatedOrder = await prisma.order.update({
-            where: { id: req.params.id },
-            data: req.body
-        });
-        res.status(200).json(updatedOrder);
+        const orderId = parseInt(req.params.id);
+        const result = await orderService.getOrder(orderId);
+
+        return res.status(result.success ? 200 : 404).json(result);
     } catch (error) {
-        if (error.code === 'P2025') {
-            return res.status(404).json({ message: 'Order not found' });
-        }
-        res.status(500).json({ message: 'Error updating order', error });
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
     }
 };
 
-// Delete order
-export const deleteOrder = async (req: Request, res: Response) => {
+export const getAllOrders = async (req: Request, res: Response) => {
     try {
-        await prisma.order.delete({
-            where: { id: req.params.id }
-        });
-        res.status(200).json({ message: 'Order deleted successfully' });
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        
+        const result = await orderService.getAllOrders(page, limit);
+
+        return res.status(result.success ? 200 : 400).json(result);
     } catch (error) {
-        if (error.code === 'P2025') {
-            return res.status(404).json({ message: 'Order not found' });
-        }
-        res.status(500).json({ message: 'Error deleting order', error });
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+};
+
+export const updateOrderStatus = async (req: Request, res: Response) => {
+    try {
+        const updateData: UpdateOrderStatusDto = {
+            orderId: parseInt(req.params.id),
+            status: req.body.status
+        };
+        
+        const result = await orderService.updateOrderStatus(updateData);
+
+        return res.status(result.success ? 200 : 400).json(result);
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
     }
 };
