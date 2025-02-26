@@ -8,6 +8,119 @@ datasource db {
 }
 
 model User {
+
+  id           Int           @id @default(autoincrement())
+  avatar       String?
+  firstName    String?       @map("first_name")
+  lastName     String?       @map("last_name")
+  username     String        @unique
+  email        String        @unique
+  password     String
+  phoneNumber  String?       @map("phone_number")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  deletedAt    DateTime?     @map("deleted_at")
+  role         String?       @default("USER")
+  addresses    Address[]
+  cart         Cart?
+  orderDetails OrderDetail[]
+  wishlist     Wishlist[]
+  reviews      Review[]
+
+  @@map("users")
+}
+
+model Address {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @map("user_id")
+  title        String?
+  addressLine1 String    @map("address_line_1")
+  addressLine2 String?   @map("address_line_2")
+  country      String
+  city         String
+  postalCode   String    @map("postal_code")
+  landmark     String?
+  phoneNumber  String    @map("phone_number")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  deletedAt    DateTime? @map("deleted_at")
+  user         User      @relation(fields: [userId], references: [id])
+
+  @@map("addresses")
+}
+
+model Category {
+  id            Int           @id @default(autoincrement())
+  name          String
+  description   String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  deletedAt     DateTime?     @map("deleted_at")
+  subCategories SubCategory[]
+  products      Product[] // Add this field for opposite relation
+
+  @@map("categories")
+}
+
+model SubCategory {
+  id          Int       @id @default(autoincrement())
+  parentId    Int       @map("parent_id")
+  name        String
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  deletedAt   DateTime? @map("deleted_at")
+  category    Category  @relation(fields: [parentId], references: [id])
+  products    Product[]
+
+  @@map("sub_categories")
+}
+
+model Product {
+  id            Int           @id @default(autoincrement())
+  name          String
+  description   String?
+  summary       String?
+  cover         String?
+  categoryId    Int           @map("category_id")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  deletedAt     DateTime?     @map("deleted_at")
+  category      Category      @relation(fields: [categoryId], references: [id])
+  subCategories SubCategory[]
+  productSkus   ProductSku[]
+  wishlist      Wishlist[]
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  reviews       Review[] // Add this field for opposite relation
+
+  @@map("products")
+}
+
+model ProductAttribute {
+  id        Int          @id @default(autoincrement())
+  type      String // ENUM ('color', 'size')
+  value     String
+  createdAt DateTime     @default(now()) @map("created_at")
+  deletedAt DateTime?    @map("deleted_at")
+  skusSize  ProductSku[] @relation("SizeAttribute")
+  skusColor ProductSku[] @relation("ColorAttribute")
+
+  @@map("product_attributes")
+}
+
+model ProductSku {
+  id               Int              @id @default(autoincrement())
+  productId        Int              @map("product_id")
+  sizeAttributeId  Int              @map("size_attribute_id")
+  colorAttributeId Int              @map("color_attribute_id")
+  sku              String
+  price            String
+  quantity         Int
+  createdAt        DateTime         @default(now()) @map("created_at")
+  deletedAt        DateTime?        @map("deleted_at")
+  product          Product          @relation(fields: [productId], references: [id])
+  sizeAttribute    ProductAttribute @relation("SizeAttribute", fields: [sizeAttributeId], references: [id])
+  colorAttribute   ProductAttribute @relation("ColorAttribute", fields: [colorAttributeId], references: [id])
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+
+  @@map("products_skus")
   id        Int       @id @default(autoincrement())
   name      String
   email     String    @unique
@@ -79,6 +192,47 @@ model ProductSku {
   product    Product  @relation(fields: [productId], references: [id])
 }
 
+
+model OrderDetail {
+  id        Int            @id @default(autoincrement())
+  userId    Int            @map("user_id")
+  paymentId Int            @map("payment_id")
+  total     Int
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  user      User           @relation(fields: [userId], references: [id])
+  items     OrderItem[]
+  payment   PaymentDetail?
+
+  @@map("order_details")
+}
+
+model OrderItem {
+  id            Int         @id @default(autoincrement())
+  orderId       Int         @map("order_id")
+  productId     Int         @map("product_id")
+  productsSkuId Int         @map("products_sku_id")
+  quantity      Int
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  order         OrderDetail @relation(fields: [orderId], references: [id])
+  product       Product     @relation(fields: [productId], references: [id])
+  productSku    ProductSku  @relation(fields: [productsSkuId], references: [id])
+
+  @@map("order_item")
+}
+
+model PaymentDetail {
+  id        Int         @id @default(autoincrement())
+  orderId   Int         @unique @map("order_id")
+  amount    Int
+  provider  String
+  status    String
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  order     OrderDetail @relation(fields: [orderId], references: [id])
+
+  @@map("payment_details")
 model Order {
   id          Int         @id @default(autoincrement())
   userId      Int
@@ -96,6 +250,7 @@ model OrderItem {
   createdAt DateTime @default(now())
   order     Order    @relation(fields: [orderId], references: [id])
   product   Product  @relation(fields: [productId], references: [id])
+
 }
 
 model Review {
@@ -107,4 +262,6 @@ model Review {
   createdAt DateTime @default(now())
   product   Product  @relation(fields: [productId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+
+  @@map("reviews")
 }
