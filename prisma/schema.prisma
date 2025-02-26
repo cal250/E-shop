@@ -8,6 +8,7 @@ datasource db {
 }
 
 model User {
+
   id           Int           @id @default(autoincrement())
   avatar       String?
   firstName    String?       @map("first_name")
@@ -120,46 +121,77 @@ model ProductSku {
   orderItems       OrderItem[]
 
   @@map("products_skus")
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  addresses Address[]
+  cart      Cart?
+  orders    Order[]
+  reviews   Review[]
+  wishlist  Wishlist?
 }
 
-model Wishlist {
-  id        Int       @id @default(autoincrement())
-  userId    Int       @map("user_id")
-  productId Int       @map("product_id")
-  createdAt DateTime  @default(now()) @map("created_at")
-  deletedAt DateTime? @map("deleted_at")
-  user      User      @relation(fields: [userId], references: [id])
-  product   Product   @relation(fields: [productId], references: [id])
-
-  @@map("wishlist")
+model Address {
+  id        Int      @id @default(autoincrement())
+  street    String
+  city      String
+  country   String
+  userId    Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Cart {
   id        Int        @id @default(autoincrement())
-  userId    Int        @unique @map("user_id")
-  total     Int
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
+  userId    Int        @unique
+  createdAt DateTime   @default(now())
   user      User       @relation(fields: [userId], references: [id])
-  items     CartItem[]
-
-  @@map("cart")
+  cartItems CartItem[]
 }
 
 model CartItem {
-  id            Int        @id @default(autoincrement())
-  cartId        Int        @map("cart_id")
-  productId     Int        @map("product_id")
-  productsSkuId Int        @map("products_sku_id")
-  quantity      Int
-  createdAt     DateTime   @default(now()) @map("created_at")
-  updatedAt     DateTime   @updatedAt @map("updated_at")
-  cart          Cart       @relation(fields: [cartId], references: [id])
-  product       Product    @relation(fields: [productId], references: [id])
-  productSku    ProductSku @relation(fields: [productsSkuId], references: [id])
-
-  @@map("cart_item")
+  id        Int      @id @default(autoincrement())
+  cartId    Int
+  productId Int
+  quantity  Int
+  createdAt DateTime @default(now())
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 }
+
+model Wishlist {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @unique
+  createdAt DateTime  @default(now())
+  products  Product[] @relation("WishlistProducts")
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model Product {
+  id          Int          @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  wishlistId  Int?
+  createdAt   DateTime     @default(now())
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+  wishlist    Wishlist?    @relation("WishlistProducts", fields: [wishlistId], references: [id])
+  skus        ProductSku[]
+  reviews     Review[]
+}
+
+model ProductSku {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  skuCode    String
+  stockCount Int
+  createdAt  DateTime @default(now())
+  product    Product  @relation(fields: [productId], references: [id])
+}
+
 
 model OrderDetail {
   id        Int            @id @default(autoincrement())
@@ -201,16 +233,33 @@ model PaymentDetail {
   order     OrderDetail @relation(fields: [orderId], references: [id])
 
   @@map("payment_details")
+model Order {
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  totalAmount Float
+  createdAt   DateTime    @default(now())
+  user        User        @relation(fields: [userId], references: [id])
+  orderItems  OrderItem[]
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+
 }
 
 model Review {
   id        Int      @id @default(autoincrement())
+  content   String
   rating    Int
-  comment   String?
-  productId Int      @map("product_id")
-  userId    Int      @map("user_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
   product   Product  @relation(fields: [productId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 
