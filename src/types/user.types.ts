@@ -18,6 +18,7 @@ export interface UpdateUserI {
 export interface UserResponseI{
     id: number;
     email: string;
+    phoneNumber?: string;
     firstName?: string;
     lastName?: string;
     createdAt: Date;

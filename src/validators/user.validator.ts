@@ -1,13 +1,18 @@
 import { z } from "zod";
 
-export const createUserValidator = z.object({
-  email: z.string().email("Invalid email format"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  firstName: z.string().min(2, "Name must be at least 2 characters"),
-  lastName: z.string().min(2, "Name must be at least 2 characters"),
-  role: z.enum(["USER", "ADMIN"]).optional().default("USER"),
-  phoneNumber: z.string().optional(),
-});
+export const createUserValidator = z
+  .object({
+    email: z.string().email("Invalid email format").optional(),
+    phoneNumber: z.string().optional(),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    firstName: z.string().min(2, "Name must be at least 2 characters"),
+    lastName: z.string().min(2, "Name must be at least 2 characters"),
+    role: z.enum(["USER", "ADMIN"]).optional().default("USER"),
+  })
+  .refine((data) => data.email || data.phoneNumber, {
+    message: "You must provide either email or phoneNumber",
+    path: ["email", "phoneNumber"],
+  });
 
 export const updateUserValidator = z.object({
   email: z.string().email("Invalid email format").optional(),

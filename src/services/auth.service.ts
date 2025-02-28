@@ -3,8 +3,9 @@ import { compare, hash } from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import { AuthTokens, TokenPayload } from "../types/auth.types";
+import prisma from "../utils/db";
+import { createUserValidator } from "../validators/user.validator";
 
-const prisma = new PrismaClient();
 export class AuthService {
   private readonly accessTokenSecret: string;
   private readonly refreshTokenSecret: string;
@@ -21,26 +22,35 @@ export class AuthService {
   }
 
   async register(userData: {
-    email: string;
+    email?: string;
     password: string;
     phoneNumber?: string;
     firstName?: string;
     lastName?: string;
     role?: string;
   }): Promise<User> {
+    createUserValidator.parse(userData);
+    if (!userData.email && !userData.phoneNumber) {
+      throw new Error("You must provide either email or phoneNumber");
+    }
     const hashedPassword = await hash(userData.password, 10);
+
+    const { email, phoneNumber, ...rest } = userData;
+
+    const username = userData.email
+      ? `${userData.email.split("@")[0]}${Math.floor(Math.random() * 1000)}`
+      : `${userData.lastName}${userData.firstName}${Math.floor(
+          Math.random() * 1000
+        )}`;
 
     const user = await prisma.user.create({
       data: {
-        email: userData.email,
-        role: userData.role || "USER",
-        password: hashedPassword,
-        phoneNumber: userData.phoneNumber,
+        ...(email ? { email } : { phoneNumber }),
         firstName: userData.firstName,
         lastName: userData.lastName,
-        username: `${userData.lastName}${userData.firstName}${Math.floor(
-          Math.random() * 1000
-        )}`,
+        password: hashedPassword,
+        role: userData.role || "USER",
+        username,
       },
     });
 
@@ -48,12 +58,20 @@ export class AuthService {
   }
 
   async login(
-    email: string,
+    emailPhoneNumberString: string,
     password: string
   ): Promise<{ user: User; tokens: AuthTokens }> {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const email =
+      emailPhoneNumberString.includes("@") && emailPhoneNumberString;
+    const phoneNumber = !email && emailPhoneNumberString;
+    let user = null;
+    if (email) {
+      user = await prisma.user.findUnique({ where: { email } });
+    } else if (phoneNumber) {
+      user = await prisma.user.findUnique({ where: { phoneNumber } });
+    }
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("User not found, invalid email or phone number");
     }
 
     const isValidPassword = await compare(password, user.password);
@@ -87,14 +105,18 @@ export class AuthService {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 30 * 60 * 1000, // 15 minutes
+      maxAge: 24 * 60 * 60 * 1000,
+      path: "/",
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
 
     res.cookie("refreshToken", tokens.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 
     });
   }
 
