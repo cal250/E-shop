@@ -3,6 +3,7 @@ import { compare, hash } from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import { AuthTokens, TokenPayload } from "../types/auth.types";
+import { createUserValidator } from "../validators/user.validator";
 
 const prisma = new PrismaClient();
 export class AuthService {
@@ -29,7 +30,12 @@ export class AuthService {
     role?: string;
   }): Promise<User> {
     const hashedPassword = await hash(userData.password, 10);
-
+    //  await createUserValidator.parseAsync({ email: string;
+    //   password: string;
+    //   phoneNumber?: string;
+    //   firstName?: string;
+    //   lastName?: string;
+    //   role?: string;})
     const user = await prisma.user.create({
       data: {
         email: userData.email,
