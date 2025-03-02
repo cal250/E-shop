@@ -14,8 +14,8 @@ export const CartController = {
 
       if (!cart) {
         cart = await prisma.cart.create({
-          // data: { userId: Number(userId), total: 0 }
-          data: { userId: Number(userId) },
+          data: { userId: Number(userId), total: 0 }
+          // data: { userId: Number(userId) },
         });
       }
 
@@ -23,8 +23,7 @@ export const CartController = {
         data: {
           cartId: cart.id,
           productId: Number(productId),
-          // productsSkuId: Number(productSkuId),
-
+          productsSkuId: Number(productSkuId),
           quantity: Number(quantity),
         },
       });
@@ -41,16 +40,16 @@ export const CartController = {
       const cart = await prisma.cart.findUnique({
         where: { userId: Number(userId) },
         include: {
-          // items: {
-          //   include: {
-          //     product: true,
-          //     productSku: true
-          //   }
-          cartItems: {
+          items: {
             include: {
               product: true,
-              // productSku:true
-            },
+              productSku: true
+            }
+          // cartItems: {
+          //   include: {
+          //     product: true,
+          //     // productSku:true
+          //   },
           },
         },
       });

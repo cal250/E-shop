@@ -17,7 +17,6 @@ export async function register(req: Request, res: Response) {
     const { tokens } = await AuthService.login(email, password);
     AuthService.setTokenCookies(res, tokens);
 
-    // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
 
     return res.status(201).json({
@@ -25,6 +24,8 @@ export async function register(req: Request, res: Response) {
       user: userWithoutPassword,
     });
   } catch (error: any) {
+    console.log(error)
+
     return res.status(400).json({
       message: error.message || "Registration failed",
     });
@@ -33,12 +34,10 @@ export async function register(req: Request, res: Response) {
 
 export async function login(req: Request, res: Response) {
   try {
-    const { email, password } = req.body;
-    const { user, tokens } = await AuthService.login(email, password);
+    const { emailPhoneNumberString, password } = req.body;
+    const { user, tokens } = await AuthService.login(emailPhoneNumberString, password);
 
     AuthService.setTokenCookies(res, tokens);
-
-    // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
 
     return res.status(200).json({
@@ -114,6 +113,18 @@ export async function changePassword(req: AuthenticatedRequest, res: Response) {
   } catch (error: any) {
     return res.status(400).json({
       message: error.message || "Password change failed",
+    });
+  }
+}
+
+
+export async function isLoggedIn(req: AuthenticatedRequest, res: Response) {
+  try {
+    const user = await AuthService.isLoggedIn(req);
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed  check login status",
     });
   }
 }
