@@ -7,6 +7,7 @@ login,
 logout,
 refreshToken,
 changePassword,
+isLoggedIn,
 } from '../controllers/auth.controller';
 
 const router = Router();
@@ -16,6 +17,7 @@ router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', logout);
 router.post('/refresh-token', refreshToken);
+router.get("/verify",authenticateToken, isLoggedIn);
 
 // Protected routes (require authentication)
 router.post('/change-password', authenticateToken, changePassword);

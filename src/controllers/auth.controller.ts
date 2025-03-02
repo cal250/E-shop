@@ -116,3 +116,15 @@ export async function changePassword(req: AuthenticatedRequest, res: Response) {
     });
   }
 }
+
+
+export async function isLoggedIn(req: AuthenticatedRequest, res: Response) {
+  try {
+    const user = await AuthService.isLoggedIn(req);
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed  check login status",
+    });
+  }
+}

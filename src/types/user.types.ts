@@ -17,10 +17,10 @@ export interface UpdateUserI {
 
 export interface UserResponseI{
     id: number;
-    email: string;
-    phoneNumber?: string;
-    firstName?: string;
-    lastName?: string;
-    createdAt: Date;
-    updatedAt: Date;
+    email: string | null;
+    phoneNumber?: string | null;
+    firstName?: string| null;
+    lastName?: string | null;
+    createdA?: Date;
+    updatedAt?: Date;
 }

@@ -5,6 +5,8 @@ import { Request, Response } from "express";
 import { AuthTokens, TokenPayload } from "../types/auth.types";
 import prisma from "../utils/db";
 import { createUserValidator } from "../validators/user.validator";
+import { UserResponseI } from "../types/user.types";
+import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 
 export class AuthService {
   private readonly accessTokenSecret: string;
@@ -116,7 +118,7 @@ export class AuthService {
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
   }
 
@@ -186,6 +188,26 @@ export class AuthService {
     });
 
     return true;
+  }
+  async isLoggedIn(
+    req: AuthenticatedRequest
+  ): Promise<(UserResponseI & { role: string | null }) | null> {
+    const userId = req?.user?.userId;
+    if (userId) {
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+      if (!user) {
+        throw new Error("user nor found");
+      }
+      return {
+        id: user.id,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      };
+    }
+    return null;
   }
 }
 

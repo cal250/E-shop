@@ -18,7 +18,6 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
         res.status(401).json({ message: 'Authentication token required' });
         return;
     }
-
     try {
         const secret = process.env.JWT_SECRET || 'your-secret-key';
         const decoded = jwt.verify(token, secret);

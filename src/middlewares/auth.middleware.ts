@@ -15,6 +15,8 @@ export const authenticateToken = async (
 ) => {
   try {
     const { accessToken, refreshToken } = AuthService.getTokenFromCookies(req);
+
+
     if (!accessToken && !refreshToken) {
       return res.status(401).json({ message: "No  tokens not found" });
     }
@@ -40,6 +42,8 @@ export const authenticateToken = async (
           return next();
         }
       }
+      console.log("not refreshed");
+      
     }
 
     return res.status(401).json({ message: "Invalid token" });
