@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { OrderService } from '../services/order.service';
 import { CreateOrderDto, UpdateOrderStatusDto } from '../types/order.types';
 
-// Create an instance of OrderService
 const orderService = new OrderService();
 
 export const createOrder = async (req: Request, res: Response) => {
@@ -39,7 +38,6 @@ export const getAllOrders = async (req: Request, res: Response) => {
         const limit = parseInt(req.query.limit as string) || 10;
         
         const result = await orderService.getAllOrders(page, limit);
-
         return res.status(result.success ? 200 : 400).json(result);
     } catch (error) {
         return res.status(500).json({
