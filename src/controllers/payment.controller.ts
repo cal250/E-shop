@@ -43,7 +43,6 @@ export const createPaymentMethod = async (req: Request, res: Response) => {
 
     // Log the balance for debugging (optional)
     const balance = await stripe.balance.retrieve();
-    console.log(balance);
 
     // Retrieve the PaymentMethod from Stripe using the provided paymentMethodId
     const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);

@@ -24,7 +24,7 @@ export async function register(req: Request, res: Response) {
       user: userWithoutPassword,
     });
   } catch (error: any) {
-    console.log(error)
+
 
     return res.status(400).json({
       message: error.message || "Registration failed",

@@ -40,7 +40,6 @@ export const authenticateToken = async (
           return next();
         }
       }
-      console.log("not refreshed");
       
     }
 
