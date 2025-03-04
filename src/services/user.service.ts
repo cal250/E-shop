@@ -89,28 +89,28 @@ export class UserService {
     return {
       id: foundUser?.id,
       email: foundUser?.email,
-      phoneNumber:foundUser?.phoneNumber,
+      phoneNumber: foundUser?.phoneNumber,
       firstName: foundUser?.firstName,
       lastName: foundUser?.lastName,
     };
   }
 
-  async  getCustomers(page = 1,
+  async getCustomers(
+    page = 1,
     limit = 10
   ): Promise<{ users: User[]; total: number }> {
     const skip = (page - 1) * limit;
 
-    const [users, total] = await Promise.all([
-      this.prisma.user.findMany({
-        skip,
-        take: limit,
-        orderBy: { createdAt: "desc" },
-        where:{
-          role:"USER"
-        }
-      }),
-      this.prisma.user.count(),
-    ]);
+    const users = await this.prisma.user.findMany({
+      skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      where: {
+        role: "USER",
+      },
+    });
+
+    const total = users.length;
 
     return { users, total };
   }

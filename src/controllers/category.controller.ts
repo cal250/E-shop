@@ -115,6 +115,7 @@ import {
         message: "Categories retrieved successfully",
       });
     } catch (error) {
+      console.log(error)
       return res.status(400).json({
         success: false,
         message:

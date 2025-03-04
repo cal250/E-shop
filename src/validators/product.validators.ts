@@ -12,7 +12,11 @@ const productBaseSchema = {
 
 // Create product validator
 export const createProductValidator = z.object({
-    ...productBaseSchema
+    ...productBaseSchema,
+    quantity: z.number().positive('Quantity must be a positive number'),
+    price: z.number().positive('Price must be a positive number'),
+    discount: z.number().min(0).max(100).optional(),
+    size: z.enum(['extra-small', 'small', 'medium', 'large', 'extra-large']).optional()
 })
 
 // Update product validator

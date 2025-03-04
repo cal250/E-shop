@@ -6,7 +6,7 @@ export const createCategorySchema = z.object({
     description: z.string().max(500).optional(),
 });
 
-// Validator for UpdateCategoryDto
+
 export const updateCategorySchema = z.object({
     name: z.string().min(1).max(100).optional(),
     description: z.string().max(500).optional(),
@@ -14,7 +14,6 @@ export const updateCategorySchema = z.object({
     message: "At least one field must be provided for update"
 });
 
-// Validator for CategoryQueryParams
 export const categoryQuerySchema = z.object({
     page: z.number().int().positive().optional().default(1),
     limit: z.number().int().positive().optional().default(10),
@@ -23,12 +22,10 @@ export const categoryQuerySchema = z.object({
     order: z.enum(['asc', 'desc']).optional().default('desc'),
 });
 
-// Validator for Category ID parameter
 export const categoryIdSchema = z.object({
     id: z.number().int().positive(),
 });
 
-// Type inference helpers
 export type CreateCategorySchema = z.infer<typeof createCategorySchema>;
 export type UpdateCategorySchema = z.infer<typeof updateCategorySchema>;
 export type CategoryQuerySchema = z.infer<typeof categoryQuerySchema>;

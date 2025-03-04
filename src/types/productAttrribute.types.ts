@@ -22,8 +22,8 @@ export interface ProductAttributeFilters {
 
 // Response types
 export interface ProductAttributeResponse extends ProductAttribute {
-    skusSize?: number[];  // IDs of ProductSkus where this attribute is used as size
-    skusColor?: number[]; // IDs of ProductSkus where this attribute is used as color
+    skusSize?: number[]; 
+    skusColor?: number[]; 
 }
 
 // For bulk operations

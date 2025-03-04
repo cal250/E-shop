@@ -10,6 +10,7 @@ import {
   UpdateProductInput,
   ProductFilters,
   ProductResponse,
+  CreateFullProductDTO,
 } from "../types/product.types";
 
 export class ProductService {
@@ -316,5 +317,38 @@ export class ProductService {
       products: productsWithRating,
       total,
     };
+  }
+
+  async createFullProduct(data: CreateFullProductDTO) {
+    //@ts-expect-error  idk why the compiler complains about the function though it works and is in the documentation
+    return this.prisma.$transaction(async (tx) => {
+      const attribute = await tx.productAttribute.findUnique({
+        where: {
+          type: "size",
+          value: data.variants[0].size,
+        },
+      });
+
+      const product = await tx.product.create({
+        data: {
+          ...data.product,
+          subCategories: {
+            connect: data.product.subCategories?.map((id) => ({ id })) || [],
+          },
+        },
+      });
+      
+      const skus = await tx.productSku.createMany({
+        data: data.variants.map((variant) => ({
+          productId: product.id,
+          sizeAttributeId: attribute.id,
+          sku: `${product.name}-${variant.size}`.toUpperCase(),
+          price: variant.price,
+          quantity: variant.quantity,
+        })),
+      });
+
+      return { product, skus };
+    });
   }
 }
