@@ -13,7 +13,7 @@ model User {
   firstName    String?       @map("first_name")
   lastName     String?       @map("last_name")
   username     String        @unique
-  email        String?        @unique
+  email        String?       @unique
   password     String
   phoneNumber  String?       @map("phone_number")
   createdAt    DateTime      @default(now()) @map("created_at")
@@ -22,8 +22,8 @@ model User {
   addresses    Address[]
   cart         Cart?
   orderDetails OrderDetail[]
-  wishlist     Wishlist[]
   reviews      Review[]
+  wishlist     Wishlist[]
 
   @@map("users")
 }
@@ -52,8 +52,8 @@ model Category {
   description   String?
   createdAt     DateTime      @default(now()) @map("created_at")
   deletedAt     DateTime?     @map("deleted_at")
+  products      Product[]
   subCategories SubCategory[]
-  products      Product[] // Add this field for opposite relation
 
   @@map("categories")
 }
@@ -66,7 +66,7 @@ model SubCategory {
   createdAt   DateTime  @default(now()) @map("created_at")
   deletedAt   DateTime? @map("deleted_at")
   category    Category  @relation(fields: [parentId], references: [id])
-  products    Product[]
+  products    Product[] @relation("ProductToSubCategory")
 
   @@map("sub_categories")
 }
@@ -80,25 +80,25 @@ model Product {
   categoryId    Int           @map("category_id")
   createdAt     DateTime      @default(now()) @map("created_at")
   deletedAt     DateTime?     @map("deleted_at")
-  category      Category      @relation(fields: [categoryId], references: [id])
-  subCategories SubCategory[]
-  productSkus   ProductSku[]
-  wishlist      Wishlist[]
   cartItems     CartItem[]
   orderItems    OrderItem[]
-  reviews       Review[] // Add this field for opposite relation
+  category      Category      @relation(fields: [categoryId], references: [id])
+  productSkus   ProductSku[]
+  reviews       Review[]
+  wishlist      Wishlist[]
+  subCategories SubCategory[] @relation("ProductToSubCategory")
 
   @@map("products")
 }
 
 model ProductAttribute {
   id        Int          @id @default(autoincrement())
-  type      String // ENUM ('color', 'size')
+  type      String
   value     String
   createdAt DateTime     @default(now()) @map("created_at")
   deletedAt DateTime?    @map("deleted_at")
-  skusSize  ProductSku[] @relation("SizeAttribute")
   skusColor ProductSku[] @relation("ColorAttribute")
+  skusSize  ProductSku[] @relation("SizeAttribute")
 
   @@map("product_attributes")
 }
@@ -113,11 +113,11 @@ model ProductSku {
   quantity         Int
   createdAt        DateTime         @default(now()) @map("created_at")
   deletedAt        DateTime?        @map("deleted_at")
-  product          Product          @relation(fields: [productId], references: [id])
-  sizeAttribute    ProductAttribute @relation("SizeAttribute", fields: [sizeAttributeId], references: [id])
-  colorAttribute   ProductAttribute @relation("ColorAttribute", fields: [colorAttributeId], references: [id])
   cartItems        CartItem[]
   orderItems       OrderItem[]
+  colorAttribute   ProductAttribute @relation("ColorAttribute", fields: [colorAttributeId], references: [id])
+  product          Product          @relation(fields: [productId], references: [id])
+  sizeAttribute    ProductAttribute @relation("SizeAttribute", fields: [sizeAttributeId], references: [id])
 
   @@map("products_skus")
 }
@@ -128,8 +128,8 @@ model Wishlist {
   productId Int       @map("product_id")
   createdAt DateTime  @default(now()) @map("created_at")
   deletedAt DateTime? @map("deleted_at")
-  user      User      @relation(fields: [userId], references: [id])
   product   Product   @relation(fields: [productId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 
   @@map("wishlist")
 }
