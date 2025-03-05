@@ -2,7 +2,6 @@ import { PrismaClient, ProductAttribute } from "@prisma/client";
 import {
   CreateProductAttributeDTO,
   UpdateProductAttributeDTO,
-  ProductAttributeFilters,
   ProductAttributeResponse,
 } from "../types/productAttrribute.types";
 import { ProductAttributeFilters as ValidatedFilters } from "../validators/productAttribute.validator";
