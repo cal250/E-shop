@@ -1,22 +1,69 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import AuthService from "../services/auth.service";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
+import { User } from "@prisma/client";
 
 export async function register(req: Request, res: Response) {
   try {
-    const { email, password, firstName, lastName,role } = req.body;
+    const { emailPhoneNumberString, password, firstName, lastName, role } =
+      req.body;
 
-    const user = await AuthService.register({
-      email,
-      password,
-      firstName,
-      lastName,
-      role 
-    });
+    if (
+      !emailPhoneNumberString ||
+      !password ||
+      !firstName ||
+      !lastName
+    ) {
+      const missingFields = [];
+      if (!emailPhoneNumberString) missingFields.push('email/phone number');
+      if (!password) missingFields.push('password');
+      if (!firstName) missingFields.push('first name');
+      if (!lastName) missingFields.push('last name');
+
+      return res.status(400).json({
+        message: `Missing required fields: ${missingFields.join(', ')}`,
+      });
+    }
+    const emailValidator = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneNumberValidator = /^[0-9]{10}$/;
+    let user: User | null = null;
+
+    let email, phoneNumber;
+    if (emailValidator.test(emailPhoneNumberString)) {
+      email = emailPhoneNumberString;
+    } else if (phoneNumberValidator.test(emailPhoneNumberString)) {
+      phoneNumber = emailPhoneNumberString;
+    } else {
+      return res.status(400).json({
+        message: "Invalid email or phone number",
+      });
+    }
+    if (email) {
+      user = await AuthService.register({
+        email,
+        password,
+        firstName,
+        lastName,
+        role,
+      });
+    } else if (phoneNumber) {
+      user = await AuthService.register({
+        phoneNumber: phoneNumber,
+        password,
+        firstName,
+        lastName,
+        role,
+      });
+    }
 
     const { tokens } = await AuthService.login(email, password);
     AuthService.setTokenCookies(res, tokens);
 
+    if (!user) {
+      return res.status(500).json({
+        message: "User registration failed",
+      });
+    }
     const { password: _, ...userWithoutPassword } = user;
 
     return res.status(201).json({
@@ -24,8 +71,6 @@ export async function register(req: Request, res: Response) {
       user: userWithoutPassword,
     });
   } catch (error: any) {
-
-
     return res.status(400).json({
       message: error.message || "Registration failed",
     });
@@ -35,7 +80,10 @@ export async function register(req: Request, res: Response) {
 export async function login(req: Request, res: Response) {
   try {
     const { emailPhoneNumberString, password } = req.body;
-    const { user, tokens } = await AuthService.login(emailPhoneNumberString, password);
+    const { user, tokens } = await AuthService.login(
+      emailPhoneNumberString,
+      password
+    );
 
     AuthService.setTokenCookies(res, tokens);
     const { password: _, ...userWithoutPassword } = user;
@@ -116,7 +164,6 @@ export async function changePassword(req: AuthenticatedRequest, res: Response) {
     });
   }
 }
-
 
 export async function isLoggedIn(req: AuthenticatedRequest, res: Response) {
   try {
