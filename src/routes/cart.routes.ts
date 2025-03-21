@@ -1,10 +1,11 @@
 import express from 'express';
 import { Router } from 'express';
+import { authenticateToken } from '../middlewares/auth.middleware';
 
 const router: Router = express.Router();
 
 // Get cart items
-router.get('/', auth, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
     try {
         // TODO: Implement get cart items logic
         res.json({ message: 'Get cart items' });
@@ -14,7 +15,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Add item to cart
-router.post('/add', auth, async (req, res) => {
+router.post('/add', authenticateToken, async (req, res) => {
     try {
         const { productId, quantity } = req.body;
         // TODO: Implement add to cart logic
@@ -25,7 +26,7 @@ router.post('/add', auth, async (req, res) => {
 });
 
 // Update cart item quantity
-router.put('/update/:itemId', auth, async (req, res) => {
+router.put('/update/:itemId', authenticateToken, async (req, res) => {
     try {
         const { itemId } = req.params;
         const { quantity } = req.body;
@@ -37,7 +38,7 @@ router.put('/update/:itemId', auth, async (req, res) => {
 });
 
 // Remove item from cart
-router.delete('/remove/:itemId', auth, async (req, res) => {
+router.delete('/remove/:itemId', authenticateToken, async (req, res) => {
     try {
         const { itemId } = req.params;
         // TODO: Implement remove from cart logic
@@ -48,7 +49,7 @@ router.delete('/remove/:itemId', auth, async (req, res) => {
 });
 
 // Clear cart
-router.delete('/clear', auth, async (req, res) => {
+router.delete('/clear', authenticateToken, async (req, res) => {
     try {
         // TODO: Implement clear cart logic
         res.json({ message: 'Cart cleared' });
