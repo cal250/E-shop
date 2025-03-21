@@ -11,16 +11,16 @@ import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 export class AuthService {
   private readonly accessTokenSecret: string;
   private readonly refreshTokenSecret: string;
-  private readonly accessTokenExpiration: string;
-  private readonly refreshTokenExpiration: string;
+  private readonly accessTokenExpiration: number;
+  private readonly refreshTokenExpiration: number;
 
   constructor() {
     this.accessTokenSecret =
       process.env.JWT_ACCESS_SECRET || "your-access-secret";
     this.refreshTokenSecret =
       process.env.JWT_REFRESH_SECRET || "your-refresh-secret";
-    this.accessTokenExpiration = "15m"; // 15 minutes
-    this.refreshTokenExpiration = "7d"; // 7 days
+    this.accessTokenExpiration = 30 * 60; // 30 minutes
+    this.refreshTokenExpiration = 24 * 7 * 60 ; // 7 days
   }
 
   async register(userData: {
@@ -70,7 +70,7 @@ export class AuthService {
     if (email) {
       user = await prisma.user.findUnique({ where: { email } });
     } else if (phoneNumber) {
-      user = await prisma.user.findUnique({ where: { phoneNumber } });
+      user = await prisma.user.findFirst({ where: { phoneNumber  } });
     }
     if (!user) {
       throw new Error("User not found, invalid email or phone number");
@@ -96,7 +96,7 @@ export class AuthService {
     });
 
     const refreshToken = jwt.sign(payload, this.refreshTokenSecret, {
-      expiresIn: this.refreshTokenExpiration,
+     expiresIn: this.refreshTokenExpiration
     });
 
     return { accessToken, refreshToken };

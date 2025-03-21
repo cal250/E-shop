@@ -22,6 +22,7 @@ export class OrderService {
 
         const order = await tx.orderDetail.create({
           data: {
+            paymentId: -1,
             userId: validatedData.userId,
             total: validatedData.payment.amount,
             payment: {

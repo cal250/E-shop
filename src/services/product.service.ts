@@ -320,9 +320,8 @@ export class ProductService {
   }
 
   async createFullProduct(data: CreateFullProductDTO) {
-    //@ts-expect-error  idk why the compiler complains about the function though it works and is in the documentation
     return this.prisma.$transaction(async (tx) => {
-      const attribute = await tx.productAttribute.findUnique({
+      const attribute = await tx.productAttribute.findFirst({
         where: {
           type: "size",
           value: data.variants[0].size,
@@ -341,10 +340,11 @@ export class ProductService {
       const skus = await tx.productSku.createMany({
         data: data.variants.map((variant) => ({
           productId: product.id,
-          sizeAttributeId: attribute.id,
+          sizeAttributeId: attribute?.id || -1,
           sku: `${product.name}-${variant.size}`.toUpperCase(),
           price: variant.price,
           quantity: variant.quantity,
+          colorAttributeId: -1,
         })),
       });
 
